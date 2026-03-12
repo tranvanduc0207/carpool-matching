@@ -395,6 +395,18 @@ body::before {
 
 </div>
 
+<script>
+// ── Chặn xem mã nguồn & DevTools ──
+document.addEventListener('keydown', e => {
+  // Ctrl+U (view source), Ctrl+J (downloads/console), Ctrl+S, Ctrl+Shift+I/J/C
+  if (e.ctrlKey && ['u','U','j','J','s','S'].includes(e.key)) { e.preventDefault(); return false; }
+  if (e.ctrlKey && e.shiftKey && ['i','I','j','J','c','C'].includes(e.key)) { e.preventDefault(); return false; }
+  // F12
+  if (e.key === 'F12') { e.preventDefault(); return false; }
+});
+document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+
 <script type="module">
 import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getDatabase, ref, set, get, update, onValue, push, serverTimestamp, runTransaction }
@@ -927,9 +939,22 @@ function showAlready(name, partner, members) {
 
 window.closeResult=()=>{ $('spinOverlay').classList.remove('show'); $('spinTitle').style.display='block'; };
 
-window.doReset=()=>{
-  if(confirm('Reset toàn bộ kết quả ghép cặp? Mọi người sẽ random lại từ đầu.'))
-    set(ref(db,`sessions/${curSid}/matches`),{}).then(()=>toast('✅ Đã reset!')).catch(e=>toast('❌ '+e.message));
+window.doReset = async () => {
+  if (!curSid) return;
+  const snap = await get(ref(db, `sessions/${curSid}`));
+  if (!snap.exists()) return;
+  const { members, matches={} } = snap.val();
+  const total = members.length;
+  const matched = Object.keys(matches).length;
+
+  if (matched < total) {
+    const remaining = total - matched;
+    toast(`⚠️ Còn ${remaining} người chưa được ghép! Hãy random hết trước khi reset.`, 4000);
+    return;
+  }
+
+  if (confirm('Đã ghép xong tất cả! Bạn có chắc muốn reset để chơi lại từ đầu?'))
+    set(ref(db, `sessions/${curSid}/matches`), {}).then(() => toast('✅ Đã reset!')).catch(e => toast('❌ ' + e.message));
 };
 
 window.goHome=()=>{

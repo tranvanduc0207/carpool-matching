@@ -326,6 +326,24 @@ body::before {
   border-radius:12px;padding:12px 16px;font-size:0.84rem;color:var(--secondary);font-weight:600;
 }
 
+.btn-random-big {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  color: #fff; border: none; border-radius: 50px;
+  font-family: 'Baloo 2', cursive; font-weight: 800; font-size: 1.15rem;
+  padding: 16px 44px; cursor: pointer; letter-spacing: 0.3px;
+  box-shadow: 0 6px 28px rgba(168,85,247,0.45);
+  transition: all 0.2s;
+  position: relative; overflow: hidden;
+}
+.btn-random-big::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  border-radius: 50px;
+}
+.btn-random-big:hover { transform: translateY(-3px) scale(1.03); box-shadow: 0 10px 36px rgba(168,85,247,0.55); }
+.btn-random-big:active { transform: translateY(0) scale(0.98); }
+
 @media(max-width:576px){
   .m-grid{grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;}
   .m-card{padding:11px 6px;}
@@ -595,8 +613,8 @@ window.goS2=()=>{
   $('ftitle').textContent=`Nữ (${FC} người)`;
   $('s2note').textContent=`Nhập tên đủ ${MC} nam và ${FC} nữ.`+(ex>0?` ${ex} nữ dư sẽ ghép nhau.`:'');
   $('minputs').innerHTML=''; $('finputs').innerHTML='';
-  for(let i=1;i<=MC;i++) $('minputs').innerHTML+=`<div class="name-row"><div class="num-b m">${i}</div><input class="ni" id="m${i}" placeholder="Tên nam ${i}..." maxlength="150"></div>`;
-  for(let i=1;i<=FC;i++) $('finputs').innerHTML+=`<div class="name-row"><div class="num-b f">${i}</div><input class="ni" id="f${i}" placeholder="Tên nữ ${i}..." maxlength="150"></div>`;
+  for(let i=1;i<=MC;i++) $('minputs').innerHTML+=`<div class="name-row"><div class="num-b m">${i}</div><input class="ni" id="m${i}" placeholder="Tên nam ${i}..." maxlength="20"></div>`;
+  for(let i=1;i<=FC;i++) $('finputs').innerHTML+=`<div class="name-row"><div class="num-b f">${i}</div><input class="ni" id="f${i}" placeholder="Tên nữ ${i}..." maxlength="20"></div>`;
 };
 
 window.createSession = async function() {
@@ -691,6 +709,13 @@ function renderGameScreen(sid, members, matches, isNew) {
       </div>
     </div>
 
+    <div class="col-12 text-center py-2">
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px">Hoặc không biết tên mình ở đâu?</div>
+      <button class="btn-random-big" onclick="randomForMe()">
+        🎲 Random Ngẫu Nhiên Cho Tôi!
+      </button>
+    </div>
+
     <div class="col-12" id="pSection" style="display:none">
       <div style="font-family:'Baloo 2',cursive;font-size:0.95rem;font-weight:700;color:var(--text-muted);margin-bottom:8px">🎉 Kết quả ghép cặp</div>
       <div class="row g-2" id="pList"></div>
@@ -738,7 +763,7 @@ function renderPairs(pairs, members) {
   pairs.forEach(([a,b])=>{
     const pa=members.find(m=>m.name===a), pb=members.find(m=>m.name===b);
     const ea=pa?.gender==='male'?'👨':'👩', eb=pb?.gender==='male'?'👨':'👩';
-    const lbl=pa?.gender==='male'?`🚗 ${a} chở ${b}`:`🚗 ${b} chở ${a}`;
+    const lbl=pa?.gender==='male'?`🚗 ${a} chở ${b}`:pb?.gender==='male'?`🚗 ${b} chở ${a}`:`🚕 ${a} & ${b} đi chung`;
     pl.innerHTML+=`
       <div class="col-md-6 col-lg-4">
         <div class="pair-row">
@@ -767,45 +792,82 @@ function uniquePairs(matches, members) {
 }
 
 // ── Pick & spin ──────────────────────────────
-window.pickMe = async function(name) {
-  if(!curSid) return;
-  const snap=await get(ref(db,`sessions/${curSid}`));
-  if(!snap.exists()) return;
-  const {members, matches={}}=snap.val();
 
-  if(matches[name]){ showAlready(name, matches[name], members); return; }
-  const asP=Object.entries(matches).find(([,v])=>v===name);
-  if(asP){ showAlready(name, asP[0], members); return; }
+// Core: compute pool for a person given current matches
+function getPool(name, members, matches) {
+  const takenNames = new Set([...Object.keys(matches), ...Object.values(matches)]);
+  const avMales   = members.filter(m => m.gender==='male'   && !takenNames.has(m.name)).map(m=>m.name);
+  const avFemales = members.filter(m => m.gender==='female' && !takenNames.has(m.name)).map(m=>m.name);
+  const person    = members.find(m => m.name===name);
+  if (person.gender === 'male') return avFemales;
+  // Female: match with males if available, else with other unmatched females
+  return avMales.length > 0 ? avMales : avFemales.filter(n => n !== name);
+}
 
-  const person=members.find(m=>m.name===name);
-  const takenNames=new Set([...Object.keys(matches),...Object.values(matches)]);
-  const avMales  =members.filter(m=>m.gender==='male'   && !takenNames.has(m.name)).map(m=>m.name);
-  const avFemales=members.filter(m=>m.gender==='female'  && !takenNames.has(m.name)).map(m=>m.name);
+// Core spin: show overlay, animate, save
+function doSpin(name, members, matches) {
+  const pool = getPool(name, members, matches);
+  if (!pool.length) { toast('Không còn ai để ghép!'); return; }
 
-  let pool=person.gender==='male'?avFemales:avMales;
-  if(!pool.length){toast('Không còn lái xe nào trống! Hãy chờ lái xe random trước.');return;}
-
-  const winner=pool[~~(Math.random()*pool.length)];
-  const ov=$('spinOverlay');
+  const winner = pool[~~(Math.random() * pool.length)];
+  const person = members.find(m => m.name === name);
+  const ov = $('spinOverlay');
   ov.classList.add('show');
-  $('resultArea').style.display='none';
-  $('spinTitle').textContent=`✨ ${name} đang random...`;
-  $('spinTitle').style.display='block';
+  $('resultArea').style.display = 'none';
+  $('spinTitle').textContent = `✨ ${name} đang random...`;
+  $('spinTitle').style.display = 'block';
 
-  runSlot(pool, winner, members, ()=>{
+  runSlot(pool, winner, members, () => {
     showResult(name, winner, person.gender, members);
     saveMatch(name, winner);
   });
+}
+
+window.pickMe = async function(name) {
+  if (!curSid) return;
+  const snap = await get(ref(db, `sessions/${curSid}`));
+  if (!snap.exists()) return;
+  const { members, matches={} } = snap.val();
+
+  // Already matched → just show result
+  if (matches[name]) { showAlready(name, matches[name], members); return; }
+  const asP = Object.entries(matches).find(([,v]) => v === name);
+  if (asP) { showAlready(name, asP[0], members); return; }
+
+  doSpin(name, members, matches);
+};
+
+// Random button: pick a random unmatched person and spin for them
+window.randomForMe = async function() {
+  if (!curSid) return;
+  const snap = await get(ref(db, `sessions/${curSid}`));
+  if (!snap.exists()) return;
+  const { members, matches={} } = snap.val();
+
+  const takenNames = new Set([...Object.keys(matches), ...Object.values(matches)]);
+  const unmatched  = members.filter(m => !takenNames.has(m.name));
+  if (!unmatched.length) { toast('🎉 Mọi người đã được ghép rồi!'); return; }
+
+  // Pick a random unmatched person who still has a valid pool
+  const candidates = unmatched.filter(m => getPool(m.name, members, matches).length > 0);
+  if (!candidates.length) { toast('Không còn ai có thể ghép thêm!'); return; }
+
+  const chosen = candidates[~~(Math.random() * candidates.length)];
+  doSpin(chosen.name, members, matches);
 };
 
 function showResult(name, partner, gender, members) {
-  const po=members.find(m=>m.name===partner);
-  const drv=gender==='male';
-  $('rEmoji').textContent=drv?'🚗':'🧡';
-  $('rPartner').textContent=partner;
-  $('rInfo').textContent=drv?`${name} lái xe · ${partner} ngồi cùng`:`${partner} lái xe · ${name} ngồi cùng`;
-  $('spinTitle').style.display='none';
-  $('resultArea').style.display='block';
+  const po = members.find(m => m.name === partner);
+  const bothFemale = gender==='female' && po?.gender==='female';
+  $('rEmoji').textContent = gender==='male' ? '🚗' : bothFemale ? '🚕' : '🧡';
+  $('rPartner').textContent = partner;
+  $('rInfo').textContent = gender==='male'
+    ? `${name} lái xe · ${partner} ngồi cùng`
+    : po?.gender==='male'
+      ? `${partner} lái xe · ${name} ngồi cùng`
+      : `${name} & ${partner} đi taxi/grab cùng nhau 🚕`;
+  $('spinTitle').style.display = 'none';
+  $('resultArea').style.display = 'block';
   confetti();
 }
 
@@ -815,8 +877,13 @@ function showAlready(name, partner, members) {
   const si=$('slotInner');
   si.innerHTML=`<div class="slot-item">${po?.gender==='female'?'👩':'👨'} ${partner}</div>`;
   si.style.transition='none'; si.style.transform='translateY(0)';
+  const bothFemale = pe?.gender==='female' && po?.gender==='female';
   $('rEmoji').textContent='✅'; $('rPartner').textContent=partner;
-  $('rInfo').textContent=pe?.gender==='male'?`${name} lái xe · ${partner} ngồi cùng`:`${partner} lái xe · ${name} ngồi cùng`;
+  $('rInfo').textContent = pe?.gender==='male'
+    ? `${name} lái xe · ${partner} ngồi cùng`
+    : po?.gender==='male'
+      ? `${partner} lái xe · ${name} ngồi cùng`
+      : `${name} & ${partner} đi taxi/grab cùng nhau 🚕`;
   $('spinTitle').style.display='none'; $('resultArea').style.display='block';
 }
 

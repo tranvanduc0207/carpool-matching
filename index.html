@@ -670,7 +670,7 @@ function renderGameScreen(sid, members, matches, isNew) {
     <div class="d-flex align-items-center gap-2">
       <span class="live-dot"></span>
       <span style="font-size:0.76rem;color:var(--text-muted)">Live</span>
-      ${isCreator?`<button class="btn-ghost" onclick="doReset()">🔄 Reset</button>`:''}
+      <button class="btn-ghost" onclick="doReset()">🔄 Reset</button>
       <button class="btn-ghost" onclick="goHome()">＋ Mới</button>
     </div>`;
 
@@ -928,7 +928,6 @@ function showAlready(name, partner, members) {
 window.closeResult=()=>{ $('spinOverlay').classList.remove('show'); $('spinTitle').style.display='block'; };
 
 window.doReset=()=>{
-  if(!localStorage.getItem(`creator_${curSid}`)){ toast('⛔ Chỉ người tạo mới được reset!'); return; }
   if(confirm('Reset toàn bộ kết quả ghép cặp? Mọi người sẽ random lại từ đầu.'))
     set(ref(db,`sessions/${curSid}/matches`),{}).then(()=>toast('✅ Đã reset!')).catch(e=>toast('❌ '+e.message));
 };

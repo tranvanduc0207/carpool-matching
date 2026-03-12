@@ -385,16 +385,14 @@ import { getDatabase, ref, set, get, update, onValue, push, serverTimestamp }
 // ╔══════════════════════════════════════════╗
 // ║  PASTE FIREBASE CONFIG CỦA BẠN VÀO ĐÂY  ║
 // ╚══════════════════════════════════════════╝
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyBNv5EeDA9J0cTz77NpWWKt6P0MMVP4kVA",
-  authDomain: "carpool-match-2f169.firebaseapp.com",
-  projectId: "carpool-match-2f169",
-  storageBucket: "carpool-match-2f169.firebasestorage.app",
-  messagingSenderId: "1022641947512",
-  appId: "1:1022641947512:web:c114cf61f803bef4f23e8d",
-  measurementId: "G-R8J4W5SBV5",
-  databaseURL: "https://carpool-match-2f169-default-rtdb.asia-southeast1.firebasedatabase.app/"
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
 };
 
 // ── utils ──────────────────────────────────
@@ -737,7 +735,7 @@ function renderPairs(pairs, members) {
   pairs.forEach(([a,b])=>{
     const pa=members.find(m=>m.name===a), pb=members.find(m=>m.name===b);
     const ea=pa?.gender==='male'?'👨':'👩', eb=pb?.gender==='male'?'👨':'👩';
-    const lbl=pa?.gender==='male'?`🚗 ${a} chở ${b}`:pb?.gender==='male'?`🚗 ${b} chở ${a}`:`🚕 ${a} & ${b} đi chung`;
+    const lbl=pa?.gender==='male'?`🚗 ${a} chở ${b}`:`🚗 ${b} chở ${a}`;
     pl.innerHTML+=`
       <div class="col-md-6 col-lg-4">
         <div class="pair-row">
@@ -781,8 +779,8 @@ window.pickMe = async function(name) {
   const avMales  =members.filter(m=>m.gender==='male'   && !takenNames.has(m.name)).map(m=>m.name);
   const avFemales=members.filter(m=>m.gender==='female'  && !takenNames.has(m.name)).map(m=>m.name);
 
-  let pool=person.gender==='male'?avFemales:[...avMales,...avFemales.filter(n=>n!==name)];
-  if(!pool.length){toast('Không còn ai để ghép!');return;}
+  let pool=person.gender==='male'?avFemales:avMales;
+  if(!pool.length){toast('Không còn lái xe nào trống! Hãy chờ lái xe random trước.');return;}
 
   const winner=pool[~~(Math.random()*pool.length)];
   const ov=$('spinOverlay');
@@ -800,10 +798,9 @@ window.pickMe = async function(name) {
 function showResult(name, partner, gender, members) {
   const po=members.find(m=>m.name===partner);
   const drv=gender==='male';
-  const both_f=!drv&&po?.gender==='female';
-  $('rEmoji').textContent=drv?'🚗':both_f?'🚕':'🧡';
+  $('rEmoji').textContent=drv?'🚗':'🧡';
   $('rPartner').textContent=partner;
-  $('rInfo').textContent=drv?`${name} lái xe · ${partner} ngồi cùng`:po?.gender==='male'?`${partner} lái xe · ${name} ngồi cùng`:`${name} & ${partner} đi taxi/grab cùng nhau 🚕`;
+  $('rInfo').textContent=drv?`${name} lái xe · ${partner} ngồi cùng`:`${partner} lái xe · ${name} ngồi cùng`;
   $('spinTitle').style.display='none';
   $('resultArea').style.display='block';
   confetti();
@@ -816,7 +813,7 @@ function showAlready(name, partner, members) {
   si.innerHTML=`<div class="slot-item">${po?.gender==='female'?'👩':'👨'} ${partner}</div>`;
   si.style.transition='none'; si.style.transform='translateY(0)';
   $('rEmoji').textContent='✅'; $('rPartner').textContent=partner;
-  $('rInfo').textContent=pe?.gender==='male'?`${name} lái xe · ${partner} ngồi cùng`:po?.gender==='male'?`${partner} lái xe · ${name} ngồi cùng`:`${name} & ${partner} đi taxi/grab cùng nhau 🚕`;
+  $('rInfo').textContent=pe?.gender==='male'?`${name} lái xe · ${partner} ngồi cùng`:`${partner} lái xe · ${name} ngồi cùng`;
   $('spinTitle').style.display='none'; $('resultArea').style.display='block';
 }
 

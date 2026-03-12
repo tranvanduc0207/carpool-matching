@@ -397,7 +397,7 @@ body::before {
 
 <script type="module">
 import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, update, onValue, push, serverTimestamp }
+import { getDatabase, ref, set, get, update, onValue, push, serverTimestamp, runTransaction }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // ╔══════════════════════════════════════════╗
@@ -613,8 +613,8 @@ window.goS2=()=>{
   $('ftitle').textContent=`Nữ (${FC} người)`;
   $('s2note').textContent=`Nhập tên đủ ${MC} nam và ${FC} nữ.`+(ex>0?` ${ex} nữ dư sẽ ghép nhau.`:'');
   $('minputs').innerHTML=''; $('finputs').innerHTML='';
-  for(let i=1;i<=MC;i++) $('minputs').innerHTML+=`<div class="name-row"><div class="num-b m">${i}</div><input class="ni" id="m${i}" placeholder="Tên nam ${i}..." maxlength="150"></div>`;
-  for(let i=1;i<=FC;i++) $('finputs').innerHTML+=`<div class="name-row"><div class="num-b f">${i}</div><input class="ni" id="f${i}" placeholder="Tên nữ ${i}..." maxlength="150"></div>`;
+  for(let i=1;i<=MC;i++) $('minputs').innerHTML+=`<div class="name-row"><div class="num-b m">${i}</div><input class="ni" id="m${i}" placeholder="Tên nam ${i}..." maxlength="20"></div>`;
+  for(let i=1;i<=FC;i++) $('finputs').innerHTML+=`<div class="name-row"><div class="num-b f">${i}</div><input class="ni" id="f${i}" placeholder="Tên nữ ${i}..." maxlength="20"></div>`;
 };
 
 window.createSession = async function() {
@@ -804,12 +804,11 @@ function getPool(name, members, matches) {
   return avMales.length > 0 ? avMales : avFemales.filter(n => n !== name);
 }
 
-// Core spin: show overlay, animate, save
-function doSpin(name, members, matches) {
-  const pool = getPool(name, members, matches);
+// Core spin: animate then atomically save via transaction
+function doSpin(name, members, matchesSnapshot) {
+  const pool = getPool(name, members, matchesSnapshot);
   if (!pool.length) { toast('Không còn ai để ghép!'); return; }
 
-  const winner = pool[~~(Math.random() * pool.length)];
   const person = members.find(m => m.name === name);
   const ov = $('spinOverlay');
   ov.classList.add('show');
@@ -817,9 +816,49 @@ function doSpin(name, members, matches) {
   $('spinTitle').textContent = `✨ ${name} đang random...`;
   $('spinTitle').style.display = 'block';
 
-  runSlot(pool, winner, members, () => {
-    showResult(name, winner, person.gender, members);
-    saveMatch(name, winner);
+  // Pre-pick a winner for animation (may be overridden by transaction result)
+  const animWinner = pool[~~(Math.random() * pool.length)];
+
+  runSlot(pool, animWinner, members, async () => {
+    // After animation: run transaction to atomically verify & write
+    try {
+      let finalWinner = null;
+
+      await runTransaction(ref(db, `sessions/${curSid}/matches`), (currentMatches) => {
+        currentMatches = currentMatches || {};
+
+        // Check: is 'name' still unmatched?
+        const alreadyKey = Object.keys(currentMatches).includes(name);
+        const alreadyVal = Object.values(currentMatches).includes(name);
+        if (alreadyKey || alreadyVal) return; // abort — already matched by someone else
+
+        // Recompute pool from live data
+        const livePool = getPool(name, members, currentMatches);
+        if (!livePool.length) return; // abort — no one left
+
+        // Pick winner: use animWinner if still available, else pick fresh
+        const winner = livePool.includes(animWinner)
+          ? animWinner
+          : livePool[~~(Math.random() * livePool.length)];
+
+        finalWinner = winner;
+        currentMatches[name]   = winner;
+        currentMatches[winner] = name;
+        return currentMatches;
+      });
+
+      if (!finalWinner) {
+        // Transaction aborted — someone else grabbed the spot
+        toast('⚠️ Đã có người ghép trước bạn! Hãy thử lại.');
+        closeResult();
+        return;
+      }
+
+      showResult(name, finalWinner, person.gender, members);
+    } catch(e) {
+      toast('❌ Lỗi lưu kết quả: ' + e.message);
+      closeResult();
+    }
   });
 }
 
@@ -848,7 +887,6 @@ window.randomForMe = async function() {
   const unmatched  = members.filter(m => !takenNames.has(m.name));
   if (!unmatched.length) { toast('🎉 Mọi người đã được ghép rồi!'); return; }
 
-  // Pick a random unmatched person who still has a valid pool
   const candidates = unmatched.filter(m => getPool(m.name, members, matches).length > 0);
   if (!candidates.length) { toast('Không còn ai có thể ghép thêm!'); return; }
 
@@ -888,11 +926,6 @@ function showAlready(name, partner, members) {
 }
 
 window.closeResult=()=>{ $('spinOverlay').classList.remove('show'); $('spinTitle').style.display='block'; };
-
-async function saveMatch(a, b) {
-  try { await update(ref(db,`sessions/${curSid}/matches`),{[a]:b,[b]:a}); }
-  catch(e){ toast('❌ Lỗi lưu: '+e.message); }
-}
 
 window.doReset=()=>{
   if(!localStorage.getItem(`creator_${curSid}`)){ toast('⛔ Chỉ người tạo mới được reset!'); return; }

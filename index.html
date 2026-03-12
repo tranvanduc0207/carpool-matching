@@ -5,1219 +5,883 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🚗 Chia Xe Đi Chơi</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --primary: #FF6B35;
-    --secondary: #FFD166;
-    --accent: #06D6A0;
-    --dark: #1a1a2e;
-    --card-bg: #ffffff;
-    --text: #2d2d2d;
-    --male: #4A90E2;
-    --female: #E2748A;
-    --road: #2d2d2d;
-  }
+:root {
+  --primary: #FF6B35;
+  --primary-dark: #e85d04;
+  --secondary: #FFD166;
+  --accent: #06D6A0;
+  --dark: #0d1117;
+  --dark2: #161b22;
+  --dark3: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-muted: #8b949e;
+  --male: #58a6ff;
+  --female: #f778ba;
+  --male-bg: rgba(88,166,255,0.12);
+  --female-bg: rgba(247,120,186,0.12);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--dark);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(255,107,53,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(88,166,255,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 80%, rgba(6,214,160,0.04) 0%, transparent 50%),
+    var(--dark);
+  z-index: 0; pointer-events: none;
+}
+.page { position: relative; z-index: 1; }
 
-  * { box-sizing: border-box; }
+/* HEADER */
+.site-header {
+  background: rgba(22,27,34,0.95);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 0;
+  backdrop-filter: blur(10px);
+  position: sticky; top: 0; z-index: 100;
+}
+.site-header h1 {
+  font-family: 'Baloo 2', cursive; font-weight: 800;
+  font-size: 1.55rem; color: var(--primary); letter-spacing: 0.5px;
+}
+.site-header .sub { font-size: 0.78rem; color: var(--text-muted); }
 
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--dark);
-    color: var(--text);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+/* CARDS */
+.card-dark {
+  background: var(--dark2); border: 1px solid var(--border);
+  border-radius: 16px; overflow: hidden;
+  animation: fadeUp 0.35s ease both;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.sec-hdr {
+  padding: 12px 18px; font-family: 'Baloo 2',cursive;
+  font-weight: 700; font-size: 0.92rem;
+  display: flex; align-items: center; gap: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.sec-hdr.male   { background: var(--male-bg); color: var(--male); }
+.sec-hdr.female { background: var(--female-bg); color: var(--female); }
+.sec-hdr.orange { background: rgba(255,107,53,0.1); color: var(--primary); }
+.sec-hdr.green  { background: rgba(6,214,160,0.1); color: var(--accent); }
 
-  /* Road background */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background:
-      repeating-linear-gradient(180deg,
-        transparent 0px, transparent 48px,
-        rgba(255,209,102,0.15) 48px, rgba(255,209,102,0.15) 60px
-      ),
-      linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
-    z-index: 0;
-    pointer-events: none;
-  }
+/* INPUTS */
+.name-row {
+  display:flex; align-items:center; gap:10px;
+  padding:8px 16px; border-bottom:1px solid rgba(48,54,61,0.5);
+  transition:background 0.15s;
+}
+.name-row:last-child { border-bottom:none; }
+.name-row:hover { background:rgba(255,255,255,0.02); }
+.num-b {
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.68rem;font-weight:800;color:#fff;
+}
+.num-b.m { background:var(--male); }
+.num-b.f { background:var(--female); }
+.ni {
+  flex:1; background:var(--dark3); border:1px solid var(--border);
+  border-radius:8px; padding:7px 12px; color:var(--text);
+  font-family:'Nunito',sans-serif; font-size:0.88rem;
+  outline:none; transition:border-color 0.2s, box-shadow 0.2s;
+}
+.ni:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(255,107,53,0.15); }
+.ni::placeholder { color:var(--text-muted); }
 
-  .page-wrapper {
-    position: relative;
-    z-index: 1;
-    padding-bottom: 60px;
-  }
+/* COUNTER */
+.ctr-wrap { display:flex;align-items:center;justify-content:center;gap:16px;padding:18px 16px; }
+.ctr-btn {
+  width:40px;height:40px;border-radius:50%;border:2px solid;background:transparent;
+  font-size:1.3rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all 0.15s;
+}
+.ctr-btn.m { border-color:var(--male);color:var(--male); }
+.ctr-btn.m:hover { background:var(--male-bg); }
+.ctr-btn.f { border-color:var(--female);color:var(--female); }
+.ctr-btn.f:hover { background:var(--female-bg); }
+.ctr-num {
+  font-family:'Baloo 2',cursive;font-size:2.6rem;font-weight:800;
+  min-width:54px;text-align:center;color:var(--text);
+}
 
-  /* Header */
-  .site-header {
-    background: linear-gradient(90deg, var(--primary), #e85d04);
-    padding: 20px 0 16px;
-    box-shadow: 0 4px 20px rgba(255,107,53,0.4);
-    position: relative;
-    overflow: hidden;
-  }
-  .site-header::after {
-    content: '🚗💨';
-    position: absolute;
-    font-size: 2rem;
-    right: -60px;
-    top: 50%;
-    transform: translateY(-50%);
-    animation: driveIn 3s ease-out forwards;
-    animation-delay: 0.5s;
-    opacity: 0;
-  }
-  @keyframes driveIn {
-    0% { right: 110%; opacity: 0; }
-    60% { opacity: 1; }
-    100% { right: 5%; opacity: 1; }
-  }
-  .site-header h1 {
-    font-family: 'Baloo 2', cursive;
-    font-weight: 800;
-    font-size: 2rem;
-    color: #fff;
-    margin: 0;
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
-    letter-spacing: 1px;
-  }
-  .site-header p {
-    color: rgba(255,255,255,0.85);
-    font-size: 0.9rem;
-    margin: 4px 0 0;
-  }
+/* BUTTONS */
+.btn-main {
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;border:none;border-radius:50px;
+  font-family:'Baloo 2',cursive;font-weight:700;font-size:0.98rem;
+  padding:12px 34px;cursor:pointer;
+  box-shadow:0 4px 18px rgba(255,107,53,0.35);transition:all 0.2s;
+}
+.btn-main:hover { transform:translateY(-2px); box-shadow:0 8px 26px rgba(255,107,53,0.45); }
+.btn-main:active { transform:translateY(0); }
+.btn-main:disabled { opacity:0.45;cursor:not-allowed;transform:none; }
+.btn-ghost {
+  background:transparent;border:1px solid var(--border);color:var(--text-muted);
+  border-radius:8px;padding:6px 14px;font-size:0.82rem;cursor:pointer;
+  transition:all 0.15s;font-family:'Nunito',sans-serif;
+}
+.btn-ghost:hover { border-color:var(--text-muted);color:var(--text); }
 
-  /* Cards */
-  .glass-card {
-    background: rgba(255,255,255,0.97);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    overflow: hidden;
-    animation: slideUp 0.4s ease both;
-  }
-  @keyframes slideUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .card-header-custom {
-    font-family: 'Baloo 2', cursive;
-    font-weight: 700;
-    font-size: 1.1rem;
-    padding: 14px 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border-bottom: 2px solid #f0f0f0;
-  }
-  .card-header-custom.male { background: linear-gradient(90deg, #e8f4fd, #d0e9fa); color: var(--male); }
-  .card-header-custom.female { background: linear-gradient(90deg, #fde8ed, #fbd0da); color: var(--female); }
-  .card-header-custom.neutral { background: linear-gradient(90deg, #fff7e6, #ffecc0); color: var(--primary); }
+/* GUIDE */
+.g-step {
+  display:flex;gap:12px;align-items:flex-start;
+  padding:10px 0;border-bottom:1px solid rgba(48,54,61,0.4);
+}
+.g-step:last-child { border-bottom:none; }
+.g-num {
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;font-size:0.72rem;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+}
+.g-txt { font-size:0.84rem;color:var(--text);line-height:1.55; }
+.g-txt a { color:var(--male);text-decoration:none; }
+.g-txt a:hover { text-decoration:underline; }
+.g-txt code {
+  background:var(--dark3);border:1px solid var(--border);
+  border-radius:4px;padding:1px 6px;font-size:0.78rem;color:var(--secondary);
+}
 
-  /* Name inputs */
-  .name-input-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 16px;
-    border-bottom: 1px solid #f5f5f5;
-    transition: background 0.2s;
-  }
-  .name-input-row:hover { background: #fafafa; }
-  .name-input-row:last-child { border-bottom: none; }
-  .member-num {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
-    color: #fff;
-  }
-  .male .member-num { background: var(--male); }
-  .female .member-num { background: var(--female); }
+/* MEMBER GRID */
+.m-grid {
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
+  gap:12px;padding:16px;
+}
+.m-card {
+  background:var(--dark3);border:1.5px solid var(--border);
+  border-radius:14px;padding:16px 10px;text-align:center;cursor:pointer;
+  transition:all 0.2s cubic-bezier(.34,1.56,.64,1);
+  position:relative;overflow:hidden;animation:popIn 0.4s ease both;
+}
+@keyframes popIn { from{opacity:0;transform:scale(0.75)} to{opacity:1;transform:scale(1)} }
+.m-card:hover:not(.matched) { transform:translateY(-4px) scale(1.04); }
+.m-card.mc { border-color:rgba(88,166,255,0.3); }
+.m-card.mc:hover:not(.matched) { border-color:var(--male);box-shadow:0 8px 22px rgba(88,166,255,0.18); }
+.m-card.fc { border-color:rgba(247,120,186,0.3); }
+.m-card.fc:hover:not(.matched) { border-color:var(--female);box-shadow:0 8px 22px rgba(247,120,186,0.18); }
+.m-card.matched { opacity:0.5;cursor:default; }
+.av {
+  width:48px;height:48px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.45rem;margin:0 auto 9px;
+}
+.mc .av { background:var(--male-bg); }
+.fc .av { background:var(--female-bg); }
+.mn { font-weight:800;font-size:0.88rem;color:var(--text);margin-bottom:4px; }
+.mt { font-size:0.67rem;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block; }
+.mt.m { background:var(--male-bg);color:var(--male); }
+.mt.f { background:var(--female-bg);color:var(--female); }
+.mb-badge {
+  position:absolute;top:5px;right:5px;background:var(--accent);color:#fff;
+  font-size:0.58rem;font-weight:800;padding:2px 6px;border-radius:10px;
+}
+.mw { font-size:0.68rem;color:var(--accent);font-weight:700;margin-top:5px; }
 
-  .name-input {
-    flex: 1;
-    border: 1.5px solid #e0e0e0;
-    border-radius: 10px;
-    padding: 7px 12px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 0.95rem;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .name-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(255,107,53,0.15);
-  }
+/* PROGRESS */
+.pb-wrap { background:var(--dark3);border-radius:10px;height:8px;overflow:hidden; }
+.pb-fill { height:100%;background:linear-gradient(90deg,var(--accent),#05c187);border-radius:10px;transition:width 0.5s ease; }
 
-  /* Buttons */
-  .btn-start {
-    background: linear-gradient(135deg, var(--primary), #e85d04);
-    color: #fff;
-    font-family: 'Baloo 2', cursive;
-    font-weight: 700;
-    font-size: 1.1rem;
-    padding: 14px 40px;
-    border: none;
-    border-radius: 50px;
-    box-shadow: 0 6px 20px rgba(255,107,53,0.4);
-    transition: all 0.2s;
-    cursor: pointer;
-    letter-spacing: 0.5px;
-  }
-  .btn-start:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 28px rgba(255,107,53,0.5);
-  }
-  .btn-start:active { transform: translateY(0); }
+/* SPIN OVERLAY */
+#spinOverlay {
+  display:none;position:fixed;inset:0;
+  background:rgba(13,17,23,0.97);z-index:9999;
+  align-items:center;justify-content:center;flex-direction:column;gap:22px;
+  backdrop-filter:blur(8px);
+}
+#spinOverlay.show { display:flex; }
+.spin-ttl { font-family:'Baloo 2',cursive;font-size:1.25rem;font-weight:700;color:var(--text);text-align:center; }
+.slot-wrap {
+  width:280px;height:80px;background:var(--dark2);
+  border:1.5px solid var(--border);border-radius:16px;overflow:hidden;position:relative;
+}
+.slot-wrap::before,.slot-wrap::after {
+  content:'';position:absolute;left:0;right:0;height:22px;z-index:2;pointer-events:none;
+}
+.slot-wrap::before { top:0;background:linear-gradient(to bottom,var(--dark2),transparent); }
+.slot-wrap::after  { bottom:0;background:linear-gradient(to top,var(--dark2),transparent); }
+.slot-inner { position:absolute;width:100%; }
+.slot-item {
+  height:80px;display:flex;align-items:center;justify-content:center;
+  font-family:'Baloo 2',cursive;font-size:1.3rem;font-weight:700;color:var(--text);gap:8px;
+}
+.res-card {
+  background:var(--dark2);border:1px solid var(--border);
+  border-radius:22px;padding:26px 30px;text-align:center;
+  max-width:310px;width:90%;
+  animation:resPop 0.45s cubic-bezier(.34,1.56,.64,1);
+  box-shadow:0 24px 60px rgba(0,0,0,0.5);
+}
+@keyframes resPop { from{opacity:0;transform:scale(0.5) rotate(-4deg)} to{opacity:1;transform:scale(1) rotate(0)} }
+.re { font-size:3.2rem;margin-bottom:6px; }
+.rl { font-size:0.78rem;color:var(--text-muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px; }
+.rp { font-family:'Baloo 2',cursive;font-size:2rem;font-weight:800;color:var(--text); }
+.ri {
+  background:rgba(6,214,160,0.1);border:1px solid rgba(6,214,160,0.22);
+  border-radius:10px;padding:9px 14px;margin-top:14px;
+  font-size:0.82rem;color:var(--accent);font-weight:600;
+}
+.btn-ok {
+  background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+  color:#fff;border:none;border-radius:50px;
+  padding:10px 30px;font-family:'Baloo 2',cursive;font-size:0.95rem;
+  font-weight:700;cursor:pointer;margin-top:14px;
+  box-shadow:0 4px 14px rgba(255,107,53,0.35);transition:all 0.2s;
+}
+.btn-ok:hover { transform:translateY(-2px); }
 
-  .btn-reset {
-    background: transparent;
-    border: 2px solid rgba(255,255,255,0.3);
-    color: rgba(255,255,255,0.7);
-    font-size: 0.85rem;
-    padding: 6px 18px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-reset:hover {
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-  }
+/* PAIR ROW */
+.pair-row {
+  background:var(--dark3);border:1px solid var(--border);
+  border-radius:12px;padding:11px 14px;
+  display:flex;align-items:center;gap:10px;
+  animation:fadeUp 0.3s ease both;
+}
+.pav {
+  width:34px;height:34px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:0.95rem;
+}
+.pav.m { background:var(--male-bg); }
+.pav.f { background:var(--female-bg); }
+.pnames { font-weight:800;font-size:0.86rem; }
+.plabel { font-size:0.72rem;color:var(--text-muted);margin-top:1px; }
 
-  /* === MAIN GAME SCREEN === */
-  .member-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 14px;
-    padding: 20px;
-  }
+/* LINK BOX */
+.link-box {
+  background:var(--dark3);border:1px solid var(--border);
+  border-radius:10px;padding:10px 14px;
+  display:flex;align-items:center;gap:10px;
+}
+.link-url { flex:1;font-size:0.78rem;color:var(--male);word-break:break-all;font-family:monospace; }
+.btn-copy {
+  background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);
+  color:var(--male);border-radius:7px;padding:5px 11px;
+  font-size:0.76rem;font-weight:700;cursor:pointer;white-space:nowrap;
+  transition:all 0.15s;flex-shrink:0;
+}
+.btn-copy:hover { background:rgba(88,166,255,0.18); }
 
-  .member-card {
-    background: #fff;
-    border-radius: 16px;
-    padding: 18px 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
-    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-    border: 2px solid transparent;
-    position: relative;
-    overflow: hidden;
-    animation: popIn 0.4s ease both;
-  }
-  .member-card:nth-child(1) { animation-delay: 0.05s; }
-  .member-card:nth-child(2) { animation-delay: 0.10s; }
-  .member-card:nth-child(3) { animation-delay: 0.15s; }
-  .member-card:nth-child(4) { animation-delay: 0.20s; }
-  .member-card:nth-child(5) { animation-delay: 0.25s; }
-  .member-card:nth-child(6) { animation-delay: 0.30s; }
-  .member-card:nth-child(7) { animation-delay: 0.35s; }
-  .member-card:nth-child(8) { animation-delay: 0.40s; }
-  .member-card:nth-child(9) { animation-delay: 0.45s; }
-  .member-card:nth-child(10) { animation-delay: 0.50s; }
-  .member-card:nth-child(11) { animation-delay: 0.55s; }
-  .member-card:nth-child(12) { animation-delay: 0.60s; }
+/* TOAST */
+.toast-wrap {
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%);
+  z-index:10000;display:flex;flex-direction:column;gap:7px;align-items:center;
+}
+.toast-msg {
+  background:var(--dark2);border:1px solid var(--border);
+  color:var(--text);font-size:0.83rem;font-weight:600;
+  padding:9px 18px;border-radius:50px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+  animation:tIn 0.3s ease;
+}
+@keyframes tIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-  @keyframes popIn {
-    from { opacity: 0; transform: scale(0.7); }
-    to { opacity: 1; transform: scale(1); }
-  }
+/* LOADER */
+.loader {
+  width:36px;height:36px;border-radius:50%;
+  border:3px solid var(--border);border-top-color:var(--primary);
+  animation:spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
 
-  .member-card:hover {
-    transform: translateY(-5px) scale(1.03);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-  }
-  .member-card.male-card { border-color: #d0e9fa; }
-  .member-card.female-card { border-color: #fbd0da; }
-  .member-card.matched {
-    cursor: default;
-    opacity: 0.7;
-    transform: none !important;
-  }
-  .member-card.matched:hover { transform: none; box-shadow: 0 3px 12px rgba(0,0,0,0.1); }
+/* LIVE DOT */
+.live-dot {
+  width:8px;height:8px;border-radius:50%;background:var(--accent);display:inline-block;
+  box-shadow:0 0 0 0 rgba(6,214,160,0.5);animation:lp 2s infinite;
+}
+@keyframes lp {
+  0%{box-shadow:0 0 0 0 rgba(6,214,160,0.5)}
+  70%{box-shadow:0 0 0 6px rgba(6,214,160,0)}
+  100%{box-shadow:0 0 0 0 rgba(6,214,160,0)}
+}
 
-  .avatar {
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.6rem;
-    margin: 0 auto 10px;
-    position: relative;
-    z-index: 1;
-  }
-  .male-card .avatar { background: linear-gradient(135deg, #e8f4fd, #b3d9f7); }
-  .female-card .avatar { background: linear-gradient(135deg, #fde8ed, #f9b8c6); }
+/* CONFETTI */
+.cf {
+  position:fixed;pointer-events:none;z-index:10001;
+  border-radius:2px;opacity:0;animation:cfF linear forwards;
+}
+@keyframes cfF {
+  0%{opacity:1;transform:translateY(0) rotate(0deg)}
+  100%{opacity:0;transform:translateY(100vh) rotate(720deg)}
+}
 
-  .member-name {
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .gender-tag {
-    font-size: 0.72rem;
-    font-weight: 600;
-    padding: 2px 10px;
-    border-radius: 20px;
-    display: inline-block;
-  }
-  .male-tag { background: #e8f4fd; color: var(--male); }
-  .female-tag { background: #fde8ed; color: var(--female); }
+.alert-info {
+  background:rgba(88,166,255,0.07);border:1px solid rgba(88,166,255,0.18);
+  border-radius:12px;padding:12px 16px;font-size:0.84rem;color:var(--text);line-height:1.5;
+}
+.alert-warn {
+  background:rgba(255,209,102,0.07);border:1px solid rgba(255,209,102,0.22);
+  border-radius:12px;padding:12px 16px;font-size:0.84rem;color:var(--secondary);font-weight:600;
+}
 
-  .match-badge {
-    position: absolute;
-    top: 6px; right: 6px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 2px 7px;
-    border-radius: 20px;
-  }
-
-  /* === SPIN SCREEN === */
-  #spinScreen {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(26,26,46,0.97);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    gap: 20px;
-  }
-  #spinScreen.show { display: flex; }
-
-  .spin-title {
-    font-family: 'Baloo 2', cursive;
-    font-size: 1.4rem;
-    color: #fff;
-    font-weight: 700;
-    text-align: center;
-  }
-
-  .wheel-container {
-    position: relative;
-    width: 300px; height: 300px;
-  }
-
-  .spin-wheel {
-    width: 100%; height: 100%;
-    border-radius: 50%;
-    border: 6px solid var(--secondary);
-    box-shadow: 0 0 40px rgba(255,209,102,0.4);
-    position: relative;
-    overflow: hidden;
-    transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 1.0);
-  }
-  .spin-wheel.spinning {
-    transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 1.0);
-  }
-
-  /* Names flying for slot machine effect */
-  .slot-container {
-    width: 280px;
-    height: 80px;
-    background: rgba(255,255,255,0.05);
-    border: 2px solid rgba(255,209,102,0.3);
-    border-radius: 16px;
-    overflow: hidden;
-    position: relative;
-  }
-  .slot-container::before, .slot-container::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0;
-    height: 25px;
-    z-index: 2;
-    pointer-events: none;
-  }
-  .slot-container::before {
-    top: 0;
-    background: linear-gradient(to bottom, rgba(26,26,46,1), transparent);
-  }
-  .slot-container::after {
-    bottom: 0;
-    background: linear-gradient(to top, rgba(26,26,46,1), transparent);
-  }
-
-  .slot-inner {
-    position: absolute;
-    width: 100%;
-    transition: transform 0.1s linear;
-  }
-  .slot-item {
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Baloo 2', cursive;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #fff;
-    gap: 10px;
-  }
-
-  .match-result-card {
-    background: linear-gradient(135deg, #fff, #fff9f0);
-    border-radius: 24px;
-    padding: 28px 36px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    max-width: 340px;
-    width: 90%;
-    animation: resultPop 0.5s cubic-bezier(.34,1.56,.64,1);
-  }
-  @keyframes resultPop {
-    from { opacity: 0; transform: scale(0.5) rotate(-5deg); }
-    to { opacity: 1; transform: scale(1) rotate(0); }
-  }
-
-  .result-emoji { font-size: 3rem; margin-bottom: 8px; }
-  .result-label {
-    font-size: 0.9rem;
-    color: #888;
-    margin-bottom: 4px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-  .result-you {
-    font-family: 'Baloo 2', cursive;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: var(--primary);
-  }
-  .result-partner-name {
-    font-family: 'Baloo 2', cursive;
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--dark);
-  }
-  .result-hearts { font-size: 1.5rem; margin: 8px 0; }
-
-  .result-car-info {
-    background: linear-gradient(135deg, #f0fdf8, #d1fae5);
-    border-radius: 12px;
-    padding: 10px 16px;
-    margin-top: 14px;
-    font-size: 0.85rem;
-    color: #065f46;
-    font-weight: 600;
-  }
-
-  .btn-close-result {
-    background: linear-gradient(135deg, var(--primary), #e85d04);
-    color: #fff;
-    border: none;
-    border-radius: 50px;
-    padding: 12px 32px;
-    font-family: 'Baloo 2', cursive;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 16px;
-    box-shadow: 0 4px 16px rgba(255,107,53,0.4);
-    transition: all 0.2s;
-  }
-  .btn-close-result:hover { transform: translateY(-2px); }
-
-  /* Match summary */
-  .match-pair {
-    background: #fff;
-    border-radius: 14px;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-    animation: slideUp 0.3s ease both;
-  }
-  .pair-avatar {
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-  }
-  .pair-male { background: linear-gradient(135deg, #e8f4fd, #b3d9f7); }
-  .pair-female { background: linear-gradient(135deg, #fde8ed, #f9b8c6); }
-  .pair-arrow { color: #ccc; font-size: 1.2rem; }
-  .pair-names { font-weight: 700; font-size: 0.9rem; color: var(--text); }
-  .pair-label { font-size: 0.75rem; color: #aaa; }
-
-  /* Progress bar */
-  .progress-custom {
-    height: 8px;
-    border-radius: 10px;
-    background: #f0f0f0;
-    overflow: hidden;
-  }
-  .progress-bar-custom {
-    height: 100%;
-    background: linear-gradient(90deg, var(--accent), #05c187);
-    border-radius: 10px;
-    transition: width 0.4s ease;
-  }
-
-  /* Confetti */
-  .confetti-piece {
-    position: fixed;
-    width: 10px; height: 10px;
-    border-radius: 2px;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 10000;
-    animation: confettiFall linear forwards;
-  }
-  @keyframes confettiFall {
-    0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-    100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
-  }
-
-  /* Tooltip for already matched */
-  .tooltip-matched {
-    position: absolute;
-    bottom: -35px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.75);
-    color: #fff;
-    font-size: 0.72rem;
-    padding: 4px 10px;
-    border-radius: 8px;
-    white-space: nowrap;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-    z-index: 10;
-  }
-  .member-card.matched:hover .tooltip-matched { opacity: 1; }
-
-  /* Sections */
-  .section-title {
-    font-family: 'Baloo 2', cursive;
-    font-weight: 700;
-    font-size: 1.2rem;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-  .section-divider {
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary), transparent);
-    margin-bottom: 16px;
-    border-radius: 2px;
-  }
-
-  /* Alert */
-  .alert-road {
-    background: linear-gradient(135deg, #fff7e6, #fff0cc);
-    border: 2px solid var(--secondary);
-    border-radius: 14px;
-    padding: 12px 16px;
-    font-size: 0.88rem;
-    color: #856404;
-    font-weight: 600;
-  }
-
-  /* Count step */
-  .count-btn {
-    width: 44px; height: 44px;
-    border-radius: 50%;
-    border: 2px solid var(--male);
-    background: #e8f4fd;
-    color: var(--male);
-    font-size: 1.4rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s;
-    display: flex; align-items: center; justify-content: center;
-    line-height: 1;
-  }
-  .count-btn.female { border-color: var(--female); background: #fde8ed; color: var(--female); }
-  .count-btn:hover { transform: scale(1.1); }
-  .count-btn:active { transform: scale(0.95); }
-  .count-display {
-    font-family: 'Baloo 2', cursive;
-    font-size: 2.8rem;
-    font-weight: 800;
-    color: var(--dark);
-    min-width: 60px;
-    text-align: center;
-  }
-
-  @media (max-width: 576px) {
-    .member-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 14px; }
-    .member-card { padding: 12px 8px; }
-    .avatar { width: 44px; height: 44px; font-size: 1.3rem; }
-    .match-result-card { padding: 20px 24px; }
-  }
+@media(max-width:576px){
+  .m-grid{grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;}
+  .m-card{padding:11px 6px;}
+  .av{width:40px;height:40px;font-size:1.2rem;}
+  .res-card{padding:20px 18px;}
+}
 </style>
 </head>
 <body>
+<div class="page">
 
-<div class="page-wrapper">
-
-  <!-- HEADER -->
-  <div class="site-header">
-    <div class="container">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <h1>🚗 Chia Xe Đi Chơi</h1>
-          <p>Random ghép cặp · Nam chở Nữ · Ai random cũng được!</p>
-        </div>
-        <button class="btn-reset" onclick="confirmReset()">🔄 Reset</button>
+<!-- HEADER -->
+<div class="site-header">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h1>🚗 Chia Xe Đi Chơi</h1>
+        <div class="sub">Real-time · Nhiều thiết bị · Firebase</div>
       </div>
+      <div id="hdr-right"></div>
     </div>
   </div>
+</div>
 
-  <!-- SETUP SCREEN -->
-  <div id="setupScreen" class="container mt-4">
-
-    <!-- STEP 1: chon so luong -->
-    <div id="stepCount">
-      <div class="row g-3 justify-content-center">
-        <div class="col-12">
-          <div class="alert-road">
-            💡 Nhập số lượng nam và nữ trong nhóm. Mỗi nam sẽ chở 1 nữ, số nữ dư sẽ ghép với nhau.
-          </div>
-        </div>
-        <div class="col-md-5">
-          <div class="glass-card">
-            <div class="card-header-custom male"><span>👨</span> Số lượng Nam</div>
-            <div class="p-4 text-center">
-              <div class="d-flex align-items-center justify-content-center gap-3">
-                <button class="count-btn" onclick="changeCount('male',-1)">−</button>
-                <span class="count-display" id="maleCountDisplay">5</span>
-                <button class="count-btn" onclick="changeCount('male',1)">+</button>
-              </div>
-              <div style="font-size:0.8rem;color:#aaa;margin-top:8px">Tối thiểu 1, tối đa 20</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-5">
-          <div class="glass-card">
-            <div class="card-header-custom female"><span>👩</span> Số lượng Nữ</div>
-            <div class="p-4 text-center">
-              <div class="d-flex align-items-center justify-content-center gap-3">
-                <button class="count-btn female" onclick="changeCount('female',-1)">−</button>
-                <span class="count-display" id="femaleCountDisplay">7</span>
-                <button class="count-btn female" onclick="changeCount('female',1)">+</button>
-              </div>
-              <div style="font-size:0.8rem;color:#aaa;margin-top:8px">Tối thiểu 1, tối đa 20</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-12">
-          <div class="glass-card p-3" id="countSummary"></div>
-        </div>
-        <div class="col-12 text-center pt-1">
-          <button class="btn-start" onclick="goToNameStep()">Tiếp theo → Nhập tên</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 2: nhap ten -->
-    <div id="stepNames" style="display:none">
-      <div class="row g-3">
-        <div class="col-12 d-flex align-items-center gap-3">
-          <button onclick="goBackToCount()" style="background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.3);color:#fff;padding:6px 16px;border-radius:20px;cursor:pointer;font-size:0.85rem;">&#8592; Quay lại</button>
-          <div class="alert-road flex-grow-1 mb-0" id="nameStepAlert"></div>
-        </div>
-        <div class="col-md-6">
-          <div class="glass-card">
-            <div class="card-header-custom male">
-              <span>👨</span> <span id="maleCardTitle">Nam (5 người — chủ xe)</span>
-            </div>
-            <div id="maleInputs"></div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="glass-card">
-            <div class="card-header-custom female">
-              <span>👩</span> <span id="femaleCardTitle">Nữ (7 người)</span>
-            </div>
-            <div id="femaleInputs"></div>
-          </div>
-        </div>
-        <div class="col-12 text-center pt-2">
-          <button class="btn-start" onclick="startGame()">🎲 Bắt đầu Random!</button>
-        </div>
-      </div>
-    </div>
-
+<!-- MAIN APP -->
+<div class="container mt-4 pb-5" id="app">
+  <div class="d-flex justify-content-center align-items-center" style="min-height:280px">
+    <div class="loader"></div>
   </div>
-
-  <!-- GAME SCREEN -->
-  <div id="gameScreen" style="display:none" class="container mt-4">
-    <div class="row g-3">
-
-      <!-- Progress -->
-      <div class="col-12">
-        <div class="glass-card p-3">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <span style="font-weight:700;font-size:0.9rem;color:#555">
-              Đã ghép: <span id="matchedCount">0</span> / 12
-            </span>
-            <span style="font-size:0.8rem;color:#aaa" id="statusText">Click vào tên mình để random!</span>
-          </div>
-          <div class="progress-custom">
-            <div class="progress-bar-custom" id="progressBar" style="width:0%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Member cards -->
-      <div class="col-12">
-        <div class="section-title">👥 Chọn tên của bạn</div>
-        <div class="section-divider"></div>
-        <div class="glass-card">
-          <div class="member-grid" id="memberGrid"></div>
-        </div>
-      </div>
-
-      <!-- Match results -->
-      <div class="col-12" id="resultsSection" style="display:none">
-        <div class="section-title">🎉 Kết quả ghép cặp</div>
-        <div class="section-divider"></div>
-        <div class="row g-2" id="matchList"></div>
-      </div>
-
-    </div>
-  </div>
-
 </div>
 
 <!-- SPIN OVERLAY -->
-<div id="spinScreen">
-  <div class="spin-title" id="spinTitle">✨ Đang tìm bạn đồng hành...</div>
-
-  <div class="slot-container">
-    <div class="slot-inner" id="slotInner"></div>
-  </div>
-
+<div id="spinOverlay">
+  <div class="spin-ttl" id="spinTitle">✨ Đang tìm bạn đồng hành...</div>
+  <div class="slot-wrap"><div class="slot-inner" id="slotInner"></div></div>
   <div id="resultArea" style="display:none">
-    <div class="match-result-card">
-      <div class="result-emoji" id="resultEmoji">🎉</div>
-      <div class="result-label">Bạn sẽ đi cùng</div>
-      <div class="result-partner-name" id="resultPartnerName"></div>
-      <div class="result-hearts">🚗💨✨</div>
-      <div class="result-car-info" id="resultCarInfo"></div>
-      <button class="btn-close-result" onclick="closeResult()">Xác nhận! 🎊</button>
+    <div class="res-card">
+      <div class="re" id="rEmoji">🎉</div>
+      <div class="rl">Bạn sẽ đi cùng</div>
+      <div class="rp" id="rPartner"></div>
+      <div class="ri" id="rInfo"></div>
+      <button class="btn-ok" onclick="closeResult()">Xác nhận! 🎊</button>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-// ============ STATE ============
-let members = [];
-let matches = {}; // { memberName: partnerName }
-let availableMales = [];
-let availableFemales = [];
-let currentSpinner = null;
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
 
-// ============ INIT SETUP ============
-function initSetup() {
-  const maleContainer = document.getElementById('maleInputs');
-  const femaleContainer = document.getElementById('femaleInputs');
-  maleContainer.innerHTML = '';
-  femaleContainer.innerHTML = '';
+</div>
 
-  for (let i = 1; i <= 5; i++) {
-    maleContainer.innerHTML += `
-      <div class="name-input-row male">
-        <div class="member-num">Nam${i}</div>
-        <input class="name-input" id="male${i}" placeholder="Nhập tên nam ${i}..." maxlength="20">
-      </div>`;
-  }
-  for (let i = 1; i <= 7; i++) {
-    femaleContainer.innerHTML += `
-      <div class="name-input-row female">
-        <div class="member-num">Nữ${i}</div>
-        <input class="name-input" id="female${i}" placeholder="Nhập tên nữ ${i}..." maxlength="20">
-      </div>`;
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, update, onValue, push, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ╔══════════════════════════════════════════╗
+// ║  PASTE FIREBASE CONFIG CỦA BẠN VÀO ĐÂY  ║
+// ╚══════════════════════════════════════════╝
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyBNv5EeDA9J0cTz77NpWWKt6P0MMVP4kVA",
+  authDomain: "carpool-match-2f169.firebaseapp.com",
+  projectId: "carpool-match-2f169",
+  storageBucket: "carpool-match-2f169.firebasestorage.app",
+  messagingSenderId: "1022641947512",
+  appId: "1:1022641947512:web:c114cf61f803bef4f23e8d",
+  measurementId: "G-R8J4W5SBV5",
+  databaseURL: "https://carpool-match-2f169-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
+
+// ── utils ──────────────────────────────────
+const $  = id => document.getElementById(id);
+const el = (tag, cls, html) => { const e=document.createElement(tag); if(cls)e.className=cls; if(html)e.innerHTML=html; return e; };
+
+function toast(msg, ms=3000) {
+  const w=$('toastWrap'), d=el('div','toast-msg'); d.textContent=msg;
+  w.appendChild(d); setTimeout(()=>d.remove(), ms);
+}
+
+function confetti() {
+  const c=['#FF6B35','#FFD166','#06D6A0','#58a6ff','#f778ba'];
+  for(let i=0;i<55;i++){
+    const d=el('div','cf'); const s=7+Math.random()*9;
+    d.style.cssText=`left:${Math.random()*100}vw;top:-12px;background:${c[~~(Math.random()*c.length)]};width:${s}px;height:${s}px;animation-duration:${1.6+Math.random()*2}s;animation-delay:${Math.random()*0.5}s;border-radius:${Math.random()>.5?'50%':'2px'}`;
+    document.body.appendChild(d); setTimeout(()=>d.remove(),3800);
   }
 }
 
-// ============ START GAME ============
-function startGame() {
-  const males = [];
-  const females = [];
+function isConfigured() { return !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.databaseURL); }
+function getSessionId() { return new URLSearchParams(location.search).get('s'); }
+function shareUrl(sid)  { return `${location.origin}${location.pathname}?s=${sid}`; }
 
-  for (let i = 1; i <= maleCount; i++) {
-    const v = document.getElementById(`male${i}`).value.trim();
-    if (!v) { alert(`Vui lòng nhập tên nam ${i}!`); return; }
-    if (males.includes(v) || females.includes(v)) { alert(`Tên "${v}" bị trùng! Hãy dùng tên khác.`); return; }
+function copyText(txt) {
+  navigator.clipboard.writeText(txt).then(()=>toast('✅ Đã copy link!')).catch(()=>prompt('Copy link:',txt));
+}
+window.copyText = copyText;
+
+// ── Slot machine ────────────────────────────
+function runSlot(pool, winner, members, cb) {
+  const si=$('slotInner');
+  const names=[]; const R=18;
+  for(let r=0;r<R;r++) names.push(...[...pool].sort(()=>Math.random()-.5));
+  names.push(winner);
+  const H=80;
+  si.innerHTML=names.map(n=>{
+    const m=members.find(x=>x.name===n);
+    return `<div class="slot-item">${m?.gender==='female'?'👩':'👨'} ${n}</div>`;
+  }).join('');
+  si.style.transition='none'; si.style.transform='translateY(0)';
+  let cnt=0, spd=45;
+  const total=names.length-1, fast=total-pool.length;
+  function tick(){
+    if(cnt>=total){ si.style.transition='transform 0.3s ease'; si.style.transform=`translateY(-${total*H}px)`; setTimeout(cb,380); return; }
+    cnt++;
+    si.style.transition=`transform ${spd}ms linear`;
+    si.style.transform=`translateY(-${cnt*H}px)`;
+    const r=cnt/fast; spd=r<.4?45:r<.7?75:r<.88?120:r<.96?190:290;
+    setTimeout(tick,spd);
+  }
+  setTimeout(tick,80);
+}
+
+// ══════════════════════════════════════════════
+//  SCREENS
+// ══════════════════════════════════════════════
+
+// ── Config guide screen ──────────────────────
+function showConfigScreen() {
+  $('hdr-right').innerHTML='';
+  $('app').innerHTML=`
+  <div class="row g-4 justify-content-center">
+    <div class="col-12 col-lg-8">
+      <div class="card-dark">
+        <div class="sec-hdr orange">⚙️ Cài đặt Firebase — Chỉ cần làm 1 lần duy nhất</div>
+        <div class="p-4">
+          <div class="alert-info mb-4">
+            App dùng <strong>Firebase Realtime Database</strong> để đồng bộ real-time.
+            Hoàn toàn <strong>miễn phí</strong> cho nhóm nhỏ. Làm theo hướng dẫn rồi paste config vào file HTML.
+          </div>
+          <div style="font-family:'Baloo 2',cursive;font-weight:700;font-size:1rem;color:var(--secondary);margin-bottom:12px">📋 Hướng dẫn từng bước</div>
+          <div class="g-step">
+            <div class="g-num">1</div>
+            <div class="g-txt">Truy cập <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> → Đăng nhập Google</div>
+          </div>
+          <div class="g-step">
+            <div class="g-num">2</div>
+            <div class="g-txt"><strong>Add project</strong> → Đặt tên project (vd: <code>chia-xe-nhom</code>) → Tắt Analytics → <strong>Create project</strong></div>
+          </div>
+          <div class="g-step">
+            <div class="g-num">3</div>
+            <div class="g-txt">Vào <strong>Build → Realtime Database</strong> → <strong>Create database</strong> → Chọn <strong>Singapore</strong> → <strong>Start in test mode</strong> → Enable</div>
+          </div>
+          <div class="g-step">
+            <div class="g-num">4</div>
+            <div class="g-txt">Click ⚙️ → <strong>Project settings</strong> → Tab <strong>General</strong> → Cuộn xuống <strong>Your apps</strong> → Nhấn icon <strong>&lt;/&gt;</strong> → Đặt tên → <strong>Register app</strong></div>
+          </div>
+          <div class="g-step">
+            <div class="g-num">5</div>
+            <div class="g-txt">Copy block <code>const firebaseConfig = { ... }</code> → Mở file HTML này → Tìm <code>FIREBASE_CONFIG</code> → Thay thế toàn bộ nội dung trong <code>{ }</code> → Lưu file</div>
+          </div>
+          <div class="g-step">
+            <div class="g-num">6</div>
+            <div class="g-txt">Deploy file lên <a href="https://pages.github.com" target="_blank">GitHub Pages</a> hoặc <a href="https://netlify.com" target="_blank">Netlify</a> (miễn phí) để có link chia sẻ. Hoặc mở file local cũng được!</div>
+          </div>
+          <div class="alert-warn mt-4">
+            ⚠️ <strong>Test mode</strong> cho phép đọc/ghi tự do trong 30 ngày. Sau đó vào Firebase Console gia hạn nếu cần dùng tiếp.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Create session screen ────────────────────
+let MC=5, FC=7;
+
+function showCreateScreen() {
+  $('hdr-right').innerHTML='';
+  $('app').innerHTML=`
+  <div class="row g-3">
+    <div class="col-12">
+      <div class="alert-info">
+        🎯 Bạn là <strong>người tổ chức</strong>. Nhập danh sách thành viên → nhận link → gửi cho mọi người để cùng random ghép cặp!
+      </div>
+    </div>
+
+    <div class="col-12" id="s1">
+      <div class="row g-3">
+        <div class="col-md-5">
+          <div class="card-dark">
+            <div class="sec-hdr male">👨 Số lượng Nam</div>
+            <div class="ctr-wrap">
+              <button class="ctr-btn m" onclick="chgC('m',-1)">−</button>
+              <span class="ctr-num" id="mcnt">5</span>
+              <button class="ctr-btn m" onclick="chgC('m',1)">+</button>
+            </div>
+            <div style="text-align:center;padding-bottom:14px;font-size:0.76rem;color:var(--text-muted)">1 – 20 người</div>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div class="card-dark">
+            <div class="sec-hdr female">👩 Số lượng Nữ</div>
+            <div class="ctr-wrap">
+              <button class="ctr-btn f" onclick="chgC('f',-1)">−</button>
+              <span class="ctr-num" id="fcnt">7</span>
+              <button class="ctr-btn f" onclick="chgC('f',1)">+</button>
+            </div>
+            <div style="text-align:center;padding-bottom:14px;font-size:0.76rem;color:var(--text-muted)">1 – 20 người</div>
+          </div>
+        </div>
+        <div class="col-md-2 d-flex">
+          <div class="card-dark w-100 p-3 text-center d-flex flex-column align-items-center justify-content-center">
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:2px">Tổng</div>
+            <div id="tcnt" style="font-family:'Baloo 2',cursive;font-size:2.4rem;font-weight:800">12</div>
+            <div id="snote" style="font-size:0.7rem;color:var(--text-muted)"></div>
+          </div>
+        </div>
+        <div class="col-12 text-center">
+          <button class="btn-main" onclick="goS2()">Tiếp theo → Nhập tên 🡆</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12" id="s2" style="display:none">
+      <div class="row g-3">
+        <div class="col-12 d-flex gap-2 align-items-center">
+          <button class="btn-ghost" onclick="goS1()">← Quay lại</button>
+          <span style="font-size:0.82rem;color:var(--text-muted)" id="s2note"></span>
+        </div>
+        <div class="col-md-6">
+          <div class="card-dark">
+            <div class="sec-hdr male">👨 <span id="mtitle"></span></div>
+            <div id="minputs"></div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card-dark">
+            <div class="sec-hdr female">👩 <span id="ftitle"></span></div>
+            <div id="finputs"></div>
+          </div>
+        </div>
+        <div class="col-12 text-center">
+          <button class="btn-main" id="createBtn" onclick="createSession()">🎲 Tạo Session & Lấy Link!</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  updateCUI();
+}
+
+window.chgC = function(g,d) {
+  if(g==='m') MC=Math.max(1,Math.min(20,MC+d));
+  else FC=Math.max(1,Math.min(20,FC+d));
+  updateCUI();
+};
+function updateCUI() {
+  if(!$('mcnt')) return;
+  $('mcnt').textContent=MC; $('fcnt').textContent=FC; $('tcnt').textContent=MC+FC;
+  const ex=FC-MC;
+  $('snote').textContent=ex>0?`${ex} nữ ghép nhau`:ex<0?`⚠️ ${-ex} nam dư`:`Cân bằng 🎯`;
+}
+window.goS1=()=>{ $('s1').style.display='block'; $('s2').style.display='none'; };
+window.goS2=()=>{
+  $('s1').style.display='none'; $('s2').style.display='block';
+  const ex=FC-MC;
+  $('mtitle').textContent=`Nam (${MC} người — lái xe)`;
+  $('ftitle').textContent=`Nữ (${FC} người)`;
+  $('s2note').textContent=`Nhập tên đủ ${MC} nam và ${FC} nữ.`+(ex>0?` ${ex} nữ dư sẽ ghép nhau.`:'');
+  $('minputs').innerHTML=''; $('finputs').innerHTML='';
+  for(let i=1;i<=MC;i++) $('minputs').innerHTML+=`<div class="name-row"><div class="num-b m">${i}</div><input class="ni" id="m${i}" placeholder="Tên nam ${i}..." maxlength="20"></div>`;
+  for(let i=1;i<=FC;i++) $('finputs').innerHTML+=`<div class="name-row"><div class="num-b f">${i}</div><input class="ni" id="f${i}" placeholder="Tên nữ ${i}..." maxlength="20"></div>`;
+};
+
+window.createSession = async function() {
+  const males=[], females=[];
+  for(let i=1;i<=MC;i++){
+    const v=$(`m${i}`).value.trim();
+    if(!v){toast('⚠️ Nhập đủ tên nam!');return;}
+    if(males.includes(v)||females.includes(v)){toast(`⚠️ Tên "${v}" bị trùng!`);return;}
     males.push(v);
   }
-  for (let i = 1; i <= femaleCount; i++) {
-    const v = document.getElementById(`female${i}`).value.trim();
-    if (!v) { alert(`Vui lòng nhập tên nữ ${i}!`); return; }
-    if (males.includes(v) || females.includes(v)) { alert(`Tên "${v}" bị trùng! Hãy dùng tên khác.`); return; }
+  for(let i=1;i<=FC;i++){
+    const v=$(`f${i}`).value.trim();
+    if(!v){toast('⚠️ Nhập đủ tên nữ!');return;}
+    if(males.includes(v)||females.includes(v)){toast(`⚠️ Tên "${v}" bị trùng!`);return;}
     females.push(v);
   }
-
-  members = [
-    ...males.map(n => ({ name: n, gender: 'male' })),
-    ...females.map(n => ({ name: n, gender: 'female' }))
-  ];
-
-  availableMales = [...males];
-  availableFemales = [...females];
-  matches = {};
-
-  // Try load saved state
-  loadState(males, females);
-}
-
-async function loadState(males, females) {
+  const btn=$('createBtn'); btn.disabled=true; btn.textContent='Đang tạo...';
+  const members=[...males.map(n=>({name:n,gender:'male'})),...females.map(n=>({name:n,gender:'female'}))];
   try {
-    const saved = await window.storage.get('carpool-matches');
-    if (saved) {
-      const data = JSON.parse(saved.value);
-      const currentNames = members.map(m => m.name).sort().join(',');
-      if (data.memberNames && data.memberNames.sort().join(',') === currentNames) {
-        matches = data.matches || {};
-        availableMales = males.filter(n => !Object.keys(matches).includes(n) && !Object.values(matches).includes(n));
-        availableFemales = females.filter(n => !Object.keys(matches).includes(n) && !Object.values(matches).includes(n));
-      }
-    }
-  } catch(e) {}
+    const sref=push(ref(db,'sessions'));
+    await set(sref,{members,matches:{},createdAt:serverTimestamp()});
+    history.replaceState(null,'',`?s=${sref.key}`);
+    startSession(sref.key, members, {}, true);
+  } catch(e) {
+    toast('❌ Lỗi: '+e.message);
+    btn.disabled=false; btn.textContent='🎲 Tạo Session & Lấy Link!';
+  }
+};
 
-  showGameScreen();
+// ── Session / game screen ────────────────────
+let curSid=null, unsubFn=null;
+
+function startSession(sid, members, matches, isNew) {
+  curSid=sid;
+  renderGameScreen(sid, members, matches, isNew);
+  // Subscribe realtime
+  if(unsubFn) unsubFn();
+  unsubFn = onValue(ref(db,`sessions/${sid}`), snap=>{
+    if(!snap.exists()) return;
+    const d=snap.val();
+    renderGrid(d.members, d.matches||{});
+    renderPairs(uniquePairs(d.matches||{}, d.members), d.members);
+    updateProgress(d.members.length, Object.keys(d.matches||{}).length);
+  });
 }
 
-function showGameScreen() {
-  document.getElementById('setupScreen').style.display = 'none';
-  document.getElementById('gameScreen').style.display = 'block';
-  renderGrid();
-  renderMatches();
-  updateProgress();
+function renderGameScreen(sid, members, matches, isNew) {
+  const url=shareUrl(sid);
+  const total=members.length, mc=Object.keys(matches).length;
+  $('hdr-right').innerHTML=`
+    <div class="d-flex align-items-center gap-2">
+      <span class="live-dot"></span>
+      <span style="font-size:0.76rem;color:var(--text-muted)">Live</span>
+      <button class="btn-ghost" onclick="doReset()">🔄 Reset</button>
+      <button class="btn-ghost" onclick="goHome()">＋ Mới</button>
+    </div>`;
+
+  $('app').innerHTML=`
+  <div class="row g-3">
+    ${isNew?`
+    <div class="col-12">
+      <div class="card-dark">
+        <div class="sec-hdr green">🔗 Gửi link này cho mọi thành viên</div>
+        <div class="p-3">
+          <div class="link-box">
+            <div class="link-url">${url}</div>
+            <button class="btn-copy" onclick="copyText('${url}')">📋 Copy</button>
+          </div>
+          <div style="font-size:0.76rem;color:var(--text-muted);margin-top:7px">Mọi người mở link → tìm tên mình → nhấn để random. Kết quả đồng bộ ngay lập tức!</div>
+        </div>
+      </div>
+    </div>`:''}
+
+    <div class="col-12">
+      <div class="card-dark p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span style="font-size:0.83rem;font-weight:700;color:var(--text-muted)">Đã ghép: <strong style="color:var(--accent)" id="mcCnt">${mc}</strong> / ${total}</span>
+          <span style="font-size:0.76rem;color:var(--text-muted)" id="stTxt">${mc===total?'🎉 Xong hết rồi!':'Click tên của bạn để random!'}</span>
+        </div>
+        <div class="pb-wrap"><div class="pb-fill" id="pbFill" style="width:${mc/total*100}%"></div></div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div style="font-family:'Baloo 2',cursive;font-size:0.95rem;font-weight:700;color:var(--text-muted);margin-bottom:8px">
+        👆 Tìm tên bạn và nhấn vào để random
+      </div>
+      <div class="card-dark">
+        <div class="m-grid" id="mGrid"></div>
+      </div>
+    </div>
+
+    <div class="col-12" id="pSection" style="display:none">
+      <div style="font-family:'Baloo 2',cursive;font-size:0.95rem;font-weight:700;color:var(--text-muted);margin-bottom:8px">🎉 Kết quả ghép cặp</div>
+      <div class="row g-2" id="pList"></div>
+    </div>
+
+    ${!isNew?`
+    <div class="col-12">
+      <div class="card-dark p-3">
+        <div style="font-size:0.76rem;color:var(--text-muted);margin-bottom:6px">🔗 Link session:</div>
+        <div class="link-box">
+          <div class="link-url">${url}</div>
+          <button class="btn-copy" onclick="copyText('${url}')">📋 Copy</button>
+        </div>
+      </div>
+    </div>`:''}
+  </div>`;
+
+  renderGrid(members, matches);
+  renderPairs(uniquePairs(matches, members), members);
 }
 
-// ============ RENDER GRID ============
-function renderGrid() {
-  const grid = document.getElementById('memberGrid');
-  grid.innerHTML = '';
-
-  members.forEach(m => {
-    const isMatched = matches[m.name];
-    const emoji = m.gender === 'male' ? '👨' : '👩';
-    const cardClass = m.gender === 'male' ? 'male-card' : 'female-card';
-    const tagClass = m.gender === 'male' ? 'male-tag' : 'female-tag';
-    const tagText = m.gender === 'male' ? '🚗 Lái xe' : '🧡 Hành khách';
-
-    grid.innerHTML += `
-      <div class="member-card ${cardClass} ${isMatched ? 'matched' : ''}" 
-           onclick="${isMatched ? '' : `pickMe('${m.name}')`}"
-           id="card-${sanitizeId(m.name)}">
-        <div class="avatar">${emoji}</div>
-        <div class="member-name">${m.name}</div>
-        <span class="gender-tag ${tagClass}">${tagText}</span>
-        ${isMatched ? `<div class="match-badge">✓ Đã ghép</div>` : ''}
-        ${isMatched ? `<div class="tooltip-matched">Đã ghép với ${matches[m.name]}</div>` : ''}
+function renderGrid(members, matches) {
+  const g=$('mGrid'); if(!g) return; g.innerHTML='';
+  members.forEach((m,i)=>{
+    const matched=!!matches[m.name];
+    const partner=matches[m.name]||'';
+    const gc=m.gender==='male'?'mc':'fc';
+    const tc=m.gender==='male'?'m':'f';
+    const tt=m.gender==='male'?'🚗 Lái':'🧡 Khách';
+    const em=m.gender==='male'?'👨':'👩';
+    g.innerHTML+=`
+      <div class="m-card ${gc}${matched?' matched':''}" onclick="${matched?'':'pickMe(\''+m.name+'\')'}" style="animation-delay:${i*.04}s">
+        <div class="av">${em}</div>
+        <div class="mn">${m.name}</div>
+        <span class="mt ${tc}">${tt}</span>
+        ${matched?`<div class="mb-badge">✓</div><div class="mw">↔ ${partner}</div>`:''}
       </div>`;
   });
 }
 
-function sanitizeId(name) {
-  return name.replace(/[^a-zA-Z0-9]/g, '_');
-}
-
-// ============ PICK ME & SPIN ============
-function pickMe(name) {
-  currentSpinner = name;
-  const person = members.find(m => m.name === name);
-
-  // Check if already matched
-  if (matches[name]) {
-    showAlreadyMatched(name);
-    return;
-  }
-
-  // Check if they were already matched AS a partner
-  const asPartner = Object.entries(matches).find(([k, v]) => v === name);
-  if (asPartner) {
-    showAlreadyMatched(name, asPartner[0]);
-    return;
-  }
-
-  const spinScreen = document.getElementById('spinScreen');
-  spinScreen.classList.add('show');
-  document.getElementById('resultArea').style.display = 'none';
-  document.getElementById('spinTitle').textContent = `✨ ${name} đang random...`;
-
-  // Determine pool
-  let pool = [];
-  if (person.gender === 'male') {
-    pool = [...availableFemales];
-  } else {
-    // Female: can match with available male or available female (pair)
-    pool = [...availableMales, ...availableFemales.filter(f => f !== name)];
-  }
-
-  if (pool.length === 0) {
-    spinScreen.classList.remove('show');
-    alert('Không còn ai để ghép! Có lỗi trong dữ liệu.');
-    return;
-  }
-
-  // Shuffle and pick
-  const winner = pool[Math.floor(Math.random() * pool.length)];
-
-  // Animate slot machine
-  runSlotAnimation(pool, winner, person.gender, () => {
-    showMatchResult(name, winner, person.gender);
-  });
-}
-
-function runSlotAnimation(pool, winner, gender, callback) {
-  const slotInner = document.getElementById('slotInner');
-  const allNames = [];
-
-  // Build a long list of names for scrolling effect
-  const repeats = 20;
-  for (let r = 0; r < repeats; r++) {
-    const shuffled = [...pool].sort(() => Math.random() - 0.5);
-    allNames.push(...shuffled);
-  }
-  allNames.push(winner); // End on winner
-
-  const itemHeight = 80;
-  slotInner.innerHTML = allNames.map(n => {
-    const m = members.find(mem => mem.name === n);
-    const e = m && m.gender === 'female' ? '👩' : '👨';
-    return `<div class="slot-item">${e} ${n}</div>`;
-  }).join('');
-
-  slotInner.style.transition = 'none';
-  slotInner.style.transform = 'translateY(0)';
-
-  let current = 0;
-  const total = allNames.length - 1;
-
-  // Fast scroll then slow down
-  let speed = 40;
-  let count = 0;
-  const maxFast = repeats * pool.length - pool.length;
-
-  function tick() {
-    if (count >= total) {
-      // Snap to final
-      slotInner.style.transition = 'transform 0.3s ease';
-      slotInner.style.transform = `translateY(-${total * itemHeight}px)`;
-      setTimeout(callback, 400);
-      return;
-    }
-    count++;
-    slotInner.style.transition = `transform ${speed}ms linear`;
-    slotInner.style.transform = `translateY(-${count * itemHeight}px)`;
-
-    // Speed control
-    if (count < maxFast * 0.4) speed = 50;
-    else if (count < maxFast * 0.7) speed = 80;
-    else if (count < maxFast * 0.85) speed = 120;
-    else if (count < maxFast * 0.95) speed = 180;
-    else speed = 280;
-
-    setTimeout(tick, speed);
-  }
-
-  setTimeout(tick, 100);
-}
-
-function showMatchResult(personName, partnerName, personGender) {
-  const partner = members.find(m => m.name === partnerName);
-  const isDriver = personGender === 'male';
-
-  document.getElementById('resultPartnerName').textContent = partnerName;
-  document.getElementById('resultEmoji').textContent = isDriver ? '🚗' : '🧡';
-
-  let carInfo = '';
-  if (isDriver) {
-    carInfo = `${personName} lái xe · ${partnerName} ngồi cùng`;
-  } else if (partner && partner.gender === 'male') {
-    carInfo = `${partnerName} lái xe · ${personName} ngồi cùng`;
-  } else {
-    carInfo = `${personName} & ${partnerName} đi xe taxi/grab cùng nhau 🚕`;
-  }
-  document.getElementById('resultCarInfo').textContent = carInfo;
-
-  document.getElementById('resultArea').style.display = 'block';
-  document.getElementById('spinTitle').style.display = 'none';
-
-  // Save match
-  confirmMatch(personName, partnerName);
-}
-
-function showAlreadyMatched(name, forcedPartner) {
-  const partner = forcedPartner || matches[name];
-  const spinScreen = document.getElementById('spinScreen');
-  spinScreen.classList.add('show');
-  document.getElementById('spinTitle').textContent = `👋 Bạn đã được ghép rồi!`;
-
-  const slotInner = document.getElementById('slotInner');
-  slotInner.innerHTML = `<div class="slot-item">🎉 ${partner}</div>`;
-  slotInner.style.transform = 'translateY(0)';
-
-  const person = members.find(m => m.name === name);
-  const partnerObj = members.find(m => m.name === partner);
-  const isDriver = person && person.gender === 'male';
-  let carInfo = '';
-  if (isDriver) {
-    carInfo = `${name} lái xe · ${partner} ngồi cùng`;
-  } else if (partnerObj && partnerObj.gender === 'male') {
-    carInfo = `${partner} lái xe · ${name} ngồi cùng`;
-  } else {
-    carInfo = `${name} & ${partner} đi taxi/grab cùng nhau 🚕`;
-  }
-
-  document.getElementById('resultPartnerName').textContent = partner;
-  document.getElementById('resultEmoji').textContent = '✅';
-  document.getElementById('resultCarInfo').textContent = carInfo;
-  document.getElementById('resultArea').style.display = 'block';
-  document.getElementById('spinTitle').style.display = 'none';
-}
-
-// ============ CONFIRM MATCH ============
-function confirmMatch(a, b) {
-  matches[a] = b;
-  matches[b] = a;
-
-  const personA = members.find(m => m.name === a);
-  const personB = members.find(m => m.name === b);
-
-  // Update available lists
-  availableMales = availableMales.filter(n => n !== a && n !== b);
-  availableFemales = availableFemales.filter(n => n !== a && n !== b);
-
-  saveState();
-  renderGrid();
-  renderMatches();
-  updateProgress();
-  launchConfetti();
-}
-
-// ============ CLOSE RESULT ============
-function closeResult() {
-  document.getElementById('spinScreen').classList.remove('show');
-  document.getElementById('spinTitle').style.display = 'block';
-  currentSpinner = null;
-}
-
-// ============ RENDER MATCHES ============
-function renderMatches() {
-  const pairs = getUniquePairs();
-  const section = document.getElementById('resultsSection');
-  const list = document.getElementById('matchList');
-
-  if (pairs.length === 0) {
-    section.style.display = 'none';
-    return;
-  }
-  section.style.display = 'block';
-  list.innerHTML = '';
-
-  pairs.forEach(([a, b]) => {
-    const pA = members.find(m => m.name === a);
-    const pB = members.find(m => m.name === b);
-    const emojiA = pA && pA.gender === 'male' ? '👨' : '👩';
-    const emojiB = pB && pB.gender === 'female' ? '👩' : (pB && pB.gender === 'male' ? '👨' : '👩');
-
-    let label = '';
-    if (pA && pA.gender === 'male') label = '🚗 ' + a + ' chở ' + b;
-    else if (pB && pB.gender === 'male') label = '🚗 ' + b + ' chở ' + a;
-    else label = '🚕 ' + a + ' & ' + b + ' đi chung';
-
-    list.innerHTML += `
+function renderPairs(pairs, members) {
+  const pl=$('pList'), ps=$('pSection'); if(!pl) return;
+  ps.style.display=pairs.length?'block':'none';
+  pl.innerHTML='';
+  pairs.forEach(([a,b])=>{
+    const pa=members.find(m=>m.name===a), pb=members.find(m=>m.name===b);
+    const ea=pa?.gender==='male'?'👨':'👩', eb=pb?.gender==='male'?'👨':'👩';
+    const lbl=pa?.gender==='male'?`🚗 ${a} chở ${b}`:pb?.gender==='male'?`🚗 ${b} chở ${a}`:`🚕 ${a} & ${b} đi chung`;
+    pl.innerHTML+=`
       <div class="col-md-6 col-lg-4">
-        <div class="match-pair">
-          <div class="pair-avatar ${pA && pA.gender === 'male' ? 'pair-male' : 'pair-female'}">${emojiA}</div>
-          <div class="flex-grow-1">
-            <div class="pair-names">${a} & ${b}</div>
-            <div class="pair-label">${label}</div>
-          </div>
-          <div class="pair-avatar ${pB && pB.gender === 'male' ? 'pair-male' : 'pair-female'}">${emojiB}</div>
+        <div class="pair-row">
+          <div class="pav ${pa?.gender==='male'?'m':'f'}">${ea}</div>
+          <div style="flex:1"><div class="pnames">${a} & ${b}</div><div class="plabel">${lbl}</div></div>
+          <div class="pav ${pb?.gender==='male'?'m':'f'}">${eb}</div>
         </div>
       </div>`;
   });
 }
 
-function getUniquePairs() {
-  const seen = new Set();
-  const pairs = [];
-  for (const [a, b] of Object.entries(matches)) {
-    const key = [a, b].sort().join('|');
-    if (!seen.has(key)) {
-      seen.add(key);
-      pairs.push([a, b]);
-    }
+function updateProgress(total, mc) {
+  const pb=$('pbFill'), cnt=$('mcCnt'), st=$('stTxt');
+  if(pb) pb.style.width=(mc/total*100)+'%';
+  if(cnt) cnt.textContent=mc;
+  if(st) st.textContent=mc===total?'🎉 Xong hết rồi!':'Click tên của bạn để random!';
+}
+
+function uniquePairs(matches, members) {
+  const seen=new Set(), pairs=[];
+  for(const [a,b] of Object.entries(matches)){
+    const k=[a,b].sort().join('|');
+    if(!seen.has(k)){seen.add(k);pairs.push([a,b]);}
   }
   return pairs;
 }
 
-// ============ PROGRESS ============
-function updateProgress() {
-  const total = members.length;
-  const matched = Object.keys(matches).length;
-  document.getElementById('matchedCount').textContent = matched;
-  document.getElementById('progressBar').style.width = (matched / total * 100) + '%';
+// ── Pick & spin ──────────────────────────────
+window.pickMe = async function(name) {
+  if(!curSid) return;
+  const snap=await get(ref(db,`sessions/${curSid}`));
+  if(!snap.exists()) return;
+  const {members, matches={}}=snap.val();
 
-  const remaining = total - matched;
-  if (remaining === 0) {
-    document.getElementById('statusText').textContent = '🎉 Đã ghép xong tất cả mọi người!';
-  } else {
-    document.getElementById('statusText').textContent = `Còn ${remaining} người chưa ghép — click tên để random!`;
-  }
+  if(matches[name]){ showAlready(name, matches[name], members); return; }
+  const asP=Object.entries(matches).find(([,v])=>v===name);
+  if(asP){ showAlready(name, asP[0], members); return; }
+
+  const person=members.find(m=>m.name===name);
+  const takenNames=new Set([...Object.keys(matches),...Object.values(matches)]);
+  const avMales  =members.filter(m=>m.gender==='male'   && !takenNames.has(m.name)).map(m=>m.name);
+  const avFemales=members.filter(m=>m.gender==='female'  && !takenNames.has(m.name)).map(m=>m.name);
+
+  let pool=person.gender==='male'?avFemales:[...avMales,...avFemales.filter(n=>n!==name)];
+  if(!pool.length){toast('Không còn ai để ghép!');return;}
+
+  const winner=pool[~~(Math.random()*pool.length)];
+  const ov=$('spinOverlay');
+  ov.classList.add('show');
+  $('resultArea').style.display='none';
+  $('spinTitle').textContent=`✨ ${name} đang random...`;
+  $('spinTitle').style.display='block';
+
+  runSlot(pool, winner, members, ()=>{
+    showResult(name, winner, person.gender, members);
+    saveMatch(name, winner);
+  });
+};
+
+function showResult(name, partner, gender, members) {
+  const po=members.find(m=>m.name===partner);
+  const drv=gender==='male';
+  const both_f=!drv&&po?.gender==='female';
+  $('rEmoji').textContent=drv?'🚗':both_f?'🚕':'🧡';
+  $('rPartner').textContent=partner;
+  $('rInfo').textContent=drv?`${name} lái xe · ${partner} ngồi cùng`:po?.gender==='male'?`${partner} lái xe · ${name} ngồi cùng`:`${name} & ${partner} đi taxi/grab cùng nhau 🚕`;
+  $('spinTitle').style.display='none';
+  $('resultArea').style.display='block';
+  confetti();
 }
 
-// ============ SAVE/LOAD ============
-async function saveState() {
+function showAlready(name, partner, members) {
+  const po=members.find(m=>m.name===partner), pe=members.find(m=>m.name===name);
+  const ov=$('spinOverlay'); ov.classList.add('show');
+  const si=$('slotInner');
+  si.innerHTML=`<div class="slot-item">${po?.gender==='female'?'👩':'👨'} ${partner}</div>`;
+  si.style.transition='none'; si.style.transform='translateY(0)';
+  $('rEmoji').textContent='✅'; $('rPartner').textContent=partner;
+  $('rInfo').textContent=pe?.gender==='male'?`${name} lái xe · ${partner} ngồi cùng`:po?.gender==='male'?`${partner} lái xe · ${name} ngồi cùng`:`${name} & ${partner} đi taxi/grab cùng nhau 🚕`;
+  $('spinTitle').style.display='none'; $('resultArea').style.display='block';
+}
+
+window.closeResult=()=>{ $('spinOverlay').classList.remove('show'); $('spinTitle').style.display='block'; };
+
+async function saveMatch(a, b) {
+  try { await update(ref(db,`sessions/${curSid}/matches`),{[a]:b,[b]:a}); }
+  catch(e){ toast('❌ Lỗi lưu: '+e.message); }
+}
+
+window.doReset=()=>{
+  if(confirm('Reset toàn bộ kết quả ghép cặp? Mọi người sẽ random lại từ đầu.'))
+    set(ref(db,`sessions/${curSid}/matches`),{}).then(()=>toast('✅ Đã reset!')).catch(e=>toast('❌ '+e.message));
+};
+
+window.goHome=()=>{
+  if(unsubFn){ unsubFn(); unsubFn=null; }
+  curSid=null;
+  history.replaceState(null,'',location.pathname);
+  MC=5; FC=7;
+  showCreateScreen();
+};
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+let db=null;
+
+async function init() {
+  if(!isConfigured()){ showConfigScreen(); return; }
+
   try {
-    const data = {
-      memberNames: members.map(m => m.name),
-      matches: matches,
-      ts: Date.now()
-    };
-    await window.storage.set('carpool-matches', JSON.stringify(data), true);
-  } catch(e) {}
-}
+    const app=initializeApp(FIREBASE_CONFIG);
+    db=getDatabase(app);
+  } catch(e){
+    $('app').innerHTML=`<div class="alert-warn">❌ Lỗi kết nối Firebase: ${e.message}<br>Kiểm tra lại FIREBASE_CONFIG trong file HTML.</div>`;
+    return;
+  }
 
-// ============ RESET ============
-function confirmReset() {
-  if (confirm('Reset tất cả kết quả và nhập lại tên? Hành động này không thể hoàn tác.')) {
-    clearState();
+  const sid=getSessionId();
+  if(!sid){ showCreateScreen(); return; }
+
+  // Load existing session
+  try {
+    const snap=await get(ref(db,`sessions/${sid}`));
+    if(!snap.exists()){
+      $('app').innerHTML=`
+        <div class="row justify-content-center"><div class="col-md-6 text-center">
+          <div class="card-dark p-5">
+            <div style="font-size:3rem;margin-bottom:10px">😕</div>
+            <div style="font-family:'Baloo 2',cursive;font-size:1.15rem;font-weight:700;margin-bottom:8px">Session không tồn tại</div>
+            <div style="color:var(--text-muted);font-size:0.86rem;margin-bottom:18px">Link đã hết hạn hoặc không hợp lệ.</div>
+            <button class="btn-main" onclick="goHome()">Tạo session mới</button>
+          </div>
+        </div></div>`;
+      return;
+    }
+    const d=snap.val();
+    startSession(sid, d.members, d.matches||{}, false);
+  } catch(e){
+    $('app').innerHTML=`<div class="alert-warn">❌ Lỗi tải dữ liệu: ${e.message}</div>`;
   }
 }
 
-async function clearState() {
-  try { await window.storage.delete('carpool-matches', true); } catch(e) {}
-  members = [];
-  matches = {};
-  availableMales = [];
-  availableFemales = [];
-  document.getElementById('gameScreen').style.display = 'none';
-  document.getElementById('setupScreen').style.display = 'block';
-  document.getElementById('stepNames').style.display = 'none';
-  document.getElementById('stepCount').style.display = 'block';
-  maleCount = 5;
-  femaleCount = 7;
-  document.getElementById('maleCountDisplay').textContent = maleCount;
-  document.getElementById('femaleCountDisplay').textContent = femaleCount;
-  updateCountSummary();
-}
-
-// ============ CONFETTI ============
-function launchConfetti() {
-  const colors = ['#FF6B35', '#FFD166', '#06D6A0', '#118AB2', '#EF476F'];
-  for (let i = 0; i < 40; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.style.cssText = `
-      left: ${Math.random() * 100}vw;
-      top: -10px;
-      background: ${colors[Math.floor(Math.random() * colors.length)]};
-      width: ${6 + Math.random() * 8}px;
-      height: ${6 + Math.random() * 8}px;
-      animation-duration: ${1.5 + Math.random() * 2}s;
-      animation-delay: ${Math.random() * 0.5}s;
-      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
-    `;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 3500);
-  }
-}
-
-// ============ COUNT STEP ============
-let maleCount = 5;
-let femaleCount = 7;
-
-function changeCount(gender, delta) {
-  if (gender === 'male') {
-    maleCount = Math.max(1, Math.min(20, maleCount + delta));
-    document.getElementById('maleCountDisplay').textContent = maleCount;
-  } else {
-    femaleCount = Math.max(1, Math.min(20, femaleCount + delta));
-    document.getElementById('femaleCountDisplay').textContent = femaleCount;
-  }
-  updateCountSummary();
-}
-
-function updateCountSummary() {
-  const total = maleCount + femaleCount;
-  const extra = femaleCount - maleCount;
-  let note = '';
-  if (extra > 0) {
-    note = `${extra} nữ dư sẽ ghép với nhau thành ${Math.ceil(extra/2)} cặp/nhóm.`;
-  } else if (extra < 0) {
-    note = `⚠️ Số nam nhiều hơn nữ — ${Math.abs(extra)} nam sẽ không có bạn đi cùng.`;
-  } else {
-    note = `Cân bằng hoàn hảo — mỗi nam ghép đúng 1 nữ! 🎯`;
-  }
-  document.getElementById('countSummary').innerHTML = `
-    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-      <span style="font-weight:700;font-size:1rem;color:var(--text)">
-        👥 Tổng: <strong>${total} người</strong>
-        &nbsp;·&nbsp; 👨 ${maleCount} nam
-        &nbsp;·&nbsp; 👩 ${femaleCount} nữ
-      </span>
-      <span style="font-size:0.85rem;color:#888;flex:1">${note}</span>
-    </div>`;
-}
-
-function goToNameStep() {
-  document.getElementById('stepCount').style.display = 'none';
-  document.getElementById('stepNames').style.display = 'block';
-  initNameInputs();
-}
-
-function goBackToCount() {
-  document.getElementById('stepNames').style.display = 'none';
-  document.getElementById('stepCount').style.display = 'block';
-}
-
-function initNameInputs() {
-  const extra = femaleCount - maleCount;
-  document.getElementById('maleCardTitle').textContent = `Nam (${maleCount} người — chủ xe)`;
-  document.getElementById('femaleCardTitle').textContent = `Nữ (${femaleCount} người)`;
-
-  let alertText = `Nhập tên ${maleCount} nam và ${femaleCount} nữ. Mỗi nam chở 1 nữ.`;
-  if (extra > 0) alertText += ` ${extra} nữ dư sẽ ghép nhau.`;
-  document.getElementById('nameStepAlert').textContent = '💡 ' + alertText;
-
-  const maleContainer = document.getElementById('maleInputs');
-  const femaleContainer = document.getElementById('femaleInputs');
-  maleContainer.innerHTML = '';
-  femaleContainer.innerHTML = '';
-
-  for (let i = 1; i <= maleCount; i++) {
-    maleContainer.innerHTML += `
-      <div class="name-input-row male">
-        <div class="member-num" style="background:var(--male);font-size:0.65rem;width:32px;height:32px">${i}</div>
-        <input class="name-input" id="male${i}" placeholder="Tên nam ${i}..." maxlength="20">
-      </div>`;
-  }
-  for (let i = 1; i <= femaleCount; i++) {
-    femaleContainer.innerHTML += `
-      <div class="name-input-row female">
-        <div class="member-num" style="background:var(--female);font-size:0.65rem;width:32px;height:32px">${i}</div>
-        <input class="name-input" id="female${i}" placeholder="Tên nữ ${i}..." maxlength="20">
-      </div>`;
-  }
-}
-
-// ============ BOOT ============
-updateCountSummary();
-
+init();
 </script>
 </body>
 </html>

@@ -595,8 +595,8 @@ window.goS2=()=>{
   $('ftitle').textContent=`Nữ (${FC} người)`;
   $('s2note').textContent=`Nhập tên đủ ${MC} nam và ${FC} nữ.`+(ex>0?` ${ex} nữ dư sẽ ghép nhau.`:'');
   $('minputs').innerHTML=''; $('finputs').innerHTML='';
-  for(let i=1;i<=MC;i++) $('minputs').innerHTML+=`<div class="name-row"><div class="num-b m">${i}</div><input class="ni" id="m${i}" placeholder="Tên nam ${i}..." maxlength="20"></div>`;
-  for(let i=1;i<=FC;i++) $('finputs').innerHTML+=`<div class="name-row"><div class="num-b f">${i}</div><input class="ni" id="f${i}" placeholder="Tên nữ ${i}..." maxlength="20"></div>`;
+  for(let i=1;i<=MC;i++) $('minputs').innerHTML+=`<div class="name-row"><div class="num-b m">${i}</div><input class="ni" id="m${i}" placeholder="Tên nam ${i}..." maxlength="150"></div>`;
+  for(let i=1;i<=FC;i++) $('finputs').innerHTML+=`<div class="name-row"><div class="num-b f">${i}</div><input class="ni" id="f${i}" placeholder="Tên nữ ${i}..." maxlength="150"></div>`;
 };
 
 window.createSession = async function() {
